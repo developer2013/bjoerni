@@ -237,6 +237,23 @@ bind_mount_einrichten() {
 }
 
 # ---------------------------------------------------------------------
+#  3b. Proxmox-Konsole
+# ---------------------------------------------------------------------
+konsole_einrichten() {
+  if [[ $KONSOLE_AUTOLOGIN == ja ]]; then
+    # cmode=shell: Die Konsole in der Proxmox-Oberfläche öffnet direkt eine
+    # root-Shell im Container – ohne Login-Bildschirm. Robuster als ein
+    # getty-Autologin, weil es nicht davon abhängt, an welchem tty die
+    # Konsole hängt oder ob die Installation schon fertig ist.
+    pct set "$CT_ID" --cmode shell
+    ok "Proxmox-Konsole öffnet direkt eine root-Shell (ohne Anmeldung)"
+  else
+    pct set "$CT_ID" --cmode tty
+    ok "Proxmox-Konsole mit Anmeldung (root + Passwort)"
+  fi
+}
+
+# ---------------------------------------------------------------------
 #  4. Startreihenfolge + NAS-Wächter
 # ---------------------------------------------------------------------
 host_dienste_einrichten() {
@@ -341,6 +358,7 @@ im_container_installieren() {
 nas_einhaengen
 container_anlegen
 bind_mount_einrichten
+konsole_einrichten
 host_dienste_einrichten
 im_container_installieren
 

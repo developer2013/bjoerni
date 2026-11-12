@@ -62,11 +62,16 @@ Die Datei hat dasselbe Format wie `proxmox/proxmox.conf.beispiel`. Mit
 
 ### Konsole ohne Passwort
 
-Setzt du kein root-Passwort für den Container (Standard), meldet dich die
-**Konsole in der Proxmox-Oberfläche automatisch als root an**. So machen es auch
-die Community Scripts. An diese Konsole kommt ohnehin nur, wer in Proxmox selbst
-angemeldet ist. Abschalten: in `/root/.scan2nas/proxmox.conf`
-`KONSOLE_AUTOLOGIN=nein` setzen und „Aktualisieren“ ausführen.
+Setzt du kein root-Passwort für den Container (Standard), öffnet die **Konsole in
+der Proxmox-Oberfläche direkt eine root-Shell**, ganz ohne Login-Bildschirm
+(Proxmox-Konsolenmodus `shell`). An diese Konsole kommt ohnehin nur, wer in
+Proxmox selbst angemeldet ist. Abschalten: in `/root/.scan2nas/proxmox.conf`
+`KONSOLE_AUTOLOGIN=nein` setzen, ein root-Passwort vergeben (`pct enter <ID>`,
+dann `passwd`) und „Aktualisieren“ ausführen.
+
+> Siehst du trotzdem `scanner login:`? Dann auf dem Proxmox-Host
+> `pct set <ID> --cmode shell` ausführen und die Konsole neu öffnen. Benutzer ist
+> immer `root`. Ohne Passwort kommt man über den Login-Bildschirm nicht rein.
 
 ---
 
