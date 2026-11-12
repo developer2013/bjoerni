@@ -45,7 +45,8 @@ Canon TR8550 ──eSCL (HTTP :80/eSCL)──▶ Container "scanner" ──Bind-
 | `systemd/scan2nas.service` | Hintergrunddienst | Container |
 | `tests/test_scan2nas.py` | unittest, läuft ohne Scanner/NAS (simuliert `scanimage`/`img2pdf`) | überall |
 | `tests/test_einrichten.py` | Tests für `einrichten.sh`: Prüffunktionen, Konfig-Rundreise, kompletter Dialogablauf mit Attrappen (whiptail, pvesm, ip, mount) | überall |
-| `docs/` | Anleitungen für Björn (01 Vorbereitung … 04 Fehlerbehebung) | – |
+| `tests/test_kurzbefehl.py` | Tests für den Kurzbefehl-Zugang: Whitelist, Ablehnung eingeschleuster Befehle, leeres Skript-Feld, Schlüssel eintragen | überall |
+| `docs/` | Anleitungen für Björn (01 Vorbereitung, 02 Installation, 03 Benutzung, 04 Fehlerbehebung, 05 iPhone-Kurzbefehl/Siri) | – |
 | `adguard-home/` | **Eigenständige** Anleitung „AdGuard Home auf Proxmox“. Nutzt das Community Script `community-scripts/ProxmoxVE/ct/adguard.sh`. Begriffe aus der Oberfläche stammen aus AdGuards `client/src/__locales/de.json`, bei Änderungen dort nachschlagen. Beispiel-IPs: FRITZ!Box `.1`, Proxmox `.5`, Drucker `.50`, AdGuard `.53`, scan2nas `.60` | – |
 | `ideen/` | **Noch nicht umgesetzte** Ideen mit Entwurf und offenen Fragen, z. B. `paperless-ngx.md`. Vor dem Umsetzen dort die Entscheidungen lesen und offene Punkte mit Carsten klären | – |
 | `adguard-home/einrichten.sh` | Einzeiler-Assistent für AdGuard: findet/erstellt den Container, erledigt den Einrichtungsassistenten und stellt alles per **AdGuard-API** (`/control`, Basic-Auth, Felder laut `openapi/openapi.yaml`) ein. Eine Datei, braucht `jq` (installiert es bei Bedarf). API-Schicht (`ag_*`, `json_*`) ist von Dialogen/Proxmox getrennt. Passwort nur über Umgebung bzw. 0600-curl-Konfig, nie in argv | Proxmox-Host, per `bash -c "$(curl …)"` |
