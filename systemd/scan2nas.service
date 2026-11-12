@@ -1,0 +1,30 @@
+# scan2nas – Hintergrunddienst im Container
+#  - liefert Scans aus der Warteschlange nach, sobald das NAS wieder da ist
+#  - räumt alte lokale Kopien der Weboberfläche auf
+#  - scannt optional automatisch, sobald Papier im Einzug liegt
+#    (AUTOMATIK_AKTIV in /etc/scan2nas/scan2nas.conf)
+#
+# Befehle:
+#   systemctl status scan2nas      Zustand anzeigen
+#   journalctl -u scan2nas -f      Meldungen live mitlesen
+#   systemctl restart scan2nas     nach Änderungen an der Konfiguration
+
+[Unit]
+Description=scan2nas – Scans vom Scanner aufs NAS (Warteschlange und Einzug-Automatik)
+Documentation=https://github.com/developer2013/bjoerni
+After=network-online.target scanservjs.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/scan2nas automatik
+# Läuft als derselbe Benutzer wie die Weboberfläche – braucht keine root-Rechte.
+User=scanservjs
+Group=users
+Restart=on-failure
+RestartSec=30
+Nice=5
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,13 @@
+# Eigene Einstellungen mit Passwörtern – niemals einchecken
+proxmox/proxmox.conf
+proxmox/*.conf
+konfiguration/scan2nas.conf
+
+# Python
+__pycache__/
+*.pyc
+
+# macOS / Editoren
+.DS_Store
+.vscode/
+.idea/

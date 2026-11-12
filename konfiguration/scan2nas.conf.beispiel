@@ -1,0 +1,125 @@
+# =====================================================================
+#  scan2nas – Einstellungen
+#  Liegt im Container unter:  /etc/scan2nas/scan2nas.conf
+#
+#  Nach Änderungen den Hintergrunddienst neu starten:
+#      systemctl restart scan2nas
+#  Danach prüfen:
+#      scan2nas test
+#
+#  Format: NAME="wert"   (Zeilen mit # sind Kommentare)
+# =====================================================================
+
+# ---------------------------------------------------------------------
+#  Scanner
+# ---------------------------------------------------------------------
+# Feste IP-Adresse des Canon TR8550 (im Router fest vergeben!)
+SCANNER_IP="192.168.178.50"
+
+# SANE-Gerätename. Leer lassen = automatisch suchen.
+# Anzeigen lassen mit:  scanimage -L
+# Beispiel: SCANNER_GERAET="airscan:e0:Canon TR8550"
+SCANNER_GERAET=""
+
+# Bei der automatischen Suche wird das erste Gerät genommen, dessen Name
+# diesen Text enthält.
+SCANNER_FILTER="airscan:"
+
+# ---------------------------------------------------------------------
+#  Scan-Einstellungen (Standard für "scan2nas scannen")
+# ---------------------------------------------------------------------
+# Auflösung in dpi: 150 (klein), 300 (Dokumente, empfohlen), 600 (Fotos)
+AUFLOESUNG="300"
+
+# farbe | grau
+MODUS="farbe"
+
+# glas (Vorlagenglas) | einzug (automatischer Vorlageneinzug oben, bis 20 Blatt)
+QUELLE="glas"
+
+# Zwischenformat der Seiten: jpeg (klein, empfohlen) | png | tiff
+BILDFORMAT="jpeg"
+
+# ---------------------------------------------------------------------
+#  Texterkennung (OCR) – macht die PDFs durchsuchbar
+# ---------------------------------------------------------------------
+OCR_AKTIV="ja"
+# Sprache(n) für die Texterkennung, mehrere mit +, z. B. "deu+eng"
+# (für eng: apt install tesseract-ocr-eng)
+OCR_SPRACHE="deu"
+# Zusätzliche Optionen für ocrmypdf:
+#   --rotate-pages  dreht verkehrt herum eingelegte Seiten richtig
+#   --deskew        richtet schiefe Seiten gerade aus
+#   --optimize 1    macht die Datei kleiner
+OCR_OPTIONEN="--rotate-pages --deskew --optimize 1"
+
+# ---------------------------------------------------------------------
+#  Ablage auf dem NAS
+# ---------------------------------------------------------------------
+# Zielordner. WICHTIG: Dieser Ordner muss auf dem NAS existieren –
+# scan2nas legt ihn absichtlich NICHT selbst an. Fehlt er, gilt das NAS
+# als „nicht eingehängt“ und die Scans kommen in die Warteschlange.
+NAS_ORDNER="/mnt/nas/Scans"
+
+# Unterordner und Dateiname (ohne .pdf). Platzhalter:
+#   %Y Jahr   %m Monat   %d Tag   %H Stunde   %M Minute   %S Sekunde
+# Beispiele:
+#   "%Y/%Y-%m/Scan_%Y-%m-%d_%H-%M-%S"  ->  2026/2026-11/Scan_2026-11-12_20-43-05.pdf
+#   "Scan_%Y-%m-%d_%H-%M-%S"           ->  alles in einem Ordner
+#   "Eingang/%Y-%m-%d_%H%M%S"          ->  z. B. für paperless-ngx
+DATEINAME_MUSTER="%Y/%Y-%m/Scan_%Y-%m-%d_%H-%M-%S"
+
+# Hierhin kommen Scans, wenn das NAS gerade nicht erreichbar ist.
+# Sie werden automatisch nachgeliefert (alle WARTESCHLANGE_INTERVALL Sekunden).
+WARTESCHLANGE="/var/lib/scan2nas/warteschlange"
+WARTESCHLANGE_INTERVALL="300"
+
+# Temporärer Arbeitsordner während des Scannens
+ARBEITSORDNER="/var/lib/scan2nas/arbeit"
+
+# ---------------------------------------------------------------------
+#  Einzug-Automatik
+#  Papier in den Einzug legen -> nach AUTOMATIK_WARTEZEIT Sekunden wird
+#  automatisch gescannt und aufs NAS gelegt.
+#
+#  ACHTUNG: Ist die Automatik an, schnappt sie sich auch Papier, das du
+#  eigentlich am Gerät KOPIEREN wolltest – außer du drückst innerhalb der
+#  Wartezeit auf Start. Deshalb ist sie standardmäßig aus.
+#  Details: docs/03-benutzung.md
+# ---------------------------------------------------------------------
+AUTOMATIK_AKTIV="nein"
+# Wie oft (Sekunden) der Scanner gefragt wird, ob Papier im Einzug liegt
+AUTOMATIK_INTERVALL="5"
+# Wie lange (Sekunden) das Papier liegen muss, bevor gescannt wird
+AUTOMATIK_WARTEZEIT="15"
+# farbe | grau
+AUTOMATIK_MODUS="grau"
+
+# ---------------------------------------------------------------------
+#  Weboberfläche (scanservjs)
+#  Jeder Scan aus der Weboberfläche wird automatisch aufs NAS kopiert.
+#  Die lokale Kopie (für Vorschau/Download im Browser) wird nach
+#  WEB_AUFBEWAHRUNG_TAGE Tagen gelöscht. 0 = nie löschen.
+# ---------------------------------------------------------------------
+WEB_AUSGABE="/var/lib/scanservjs/output"
+WEB_AUFBEWAHRUNG_TAGE="7"
+
+# ---------------------------------------------------------------------
+#  Sonstiges
+# ---------------------------------------------------------------------
+# DEBUG | INFO | WARNING | ERROR
+LOGLEVEL="INFO"
+
+# ---------------------------------------------------------------------
+#  Für Experten – nur ändern, wenn du weißt, was du tust
+# ---------------------------------------------------------------------
+# eSCL-Adresse für die Statusabfrage. Leer = http://<SCANNER_IP>/eSCL
+ESCL_URL=""
+# Namen, die das SANE-Backend für Quelle und Modus erwartet.
+# Anzeigen lassen mit:  scanimage -d "<gerät>" --help
+# (sane-airscan: Flatbed/ADF und Color/Gray; pixma-Backend: z. B.
+#  "Flatbed"/"Automatic Document Feeder" und "Color"/"Gray")
+SANE_QUELLE_GLAS="Flatbed"
+SANE_QUELLE_EINZUG="ADF"
+SANE_MODUS_FARBE="Color"
+SANE_MODUS_GRAU="Gray"

@@ -1,0 +1,79 @@
+# =====================================================================
+#  scan2nas – Einstellungen für den Proxmox-Host
+#
+#  1. Kopieren:   cp proxmox/proxmox.conf.beispiel proxmox/proxmox.conf
+#  2. Anpassen:   nano proxmox/proxmox.conf
+#  3. Ausführen:  ./proxmox/lxc-erstellen.sh
+#
+#  proxmox.conf enthält dein NAS-Passwort und wird von git ignoriert.
+#  Passwörter mit Sonderzeichen ($ ! ` " usw.) in EINFACHE Anführungszeichen
+#  setzen, z. B.:  NAS_PASSWORT='Ge$heim!123'
+# =====================================================================
+
+# ---------------------------------------------------------------------
+#  Container
+# ---------------------------------------------------------------------
+# Container-ID. Leer = nächste freie ID. Gibt es schon einen Container mit
+# dem Namen CT_NAME, wird dieser wiederverwendet (nur aktualisiert).
+CT_ID=""
+CT_NAME="scanner"
+
+# Wo die Festplatte des Containers liegt (Proxmox: Rechenzentrum -> Storage)
+CT_SPEICHER="local-lvm"
+# Wo das Debian-Template gespeichert wird
+TEMPLATE_SPEICHER="local"
+
+# Netzwerk
+CT_BRIDGE="vmbr0"
+# "dhcp" oder feste Adresse mit Netzmaske, z. B. "192.168.178.60/24"
+CT_IP="dhcp"
+# Nur bei fester IP nötig, z. B. "192.168.178.1"
+CT_GATEWAY=""
+# VLAN-Tag, falls du VLANs nutzt (sonst leer lassen)
+CT_VLAN=""
+
+# Ressourcen – mehr als genug für Scans mit Texterkennung
+CT_KERNE="2"
+CT_RAM="1024"      # MB
+CT_SWAP="512"      # MB
+CT_DISK="8"        # GB
+
+# root-Passwort für die Konsole in der Proxmox-Oberfläche.
+# Leer = kein Passwort; Zugang dann nur über "pct enter <ID>" auf dem Host.
+CT_PASSWORT=""
+# Optional: Datei mit öffentlichem SSH-Schlüssel, z. B. "/root/.ssh/id_ed25519.pub"
+CT_SSH_SCHLUESSEL=""
+
+# ---------------------------------------------------------------------
+#  Scanner
+# ---------------------------------------------------------------------
+# Feste IP-Adresse des Canon TR8550 (im Router fest vergeben!)
+SCANNER_IP="192.168.178.50"
+
+# ---------------------------------------------------------------------
+#  NAS
+# ---------------------------------------------------------------------
+# cifs = SMB/Windows-Freigabe (Synology, QNAP, FRITZ!Box, Windows, TrueNAS …)
+# nfs  = NFS-Freigabe
+NAS_TYP="cifs"
+
+# IP-Adresse oder Name des NAS
+NAS_SERVER="192.168.178.10"
+
+# cifs: Name der Freigabe, z. B. "scans" (ergibt //192.168.178.10/scans)
+# nfs:  Exportpfad, z. B. "/volume1/scans"
+NAS_FREIGABE="scans"
+
+# Nur bei cifs: Benutzer mit Schreibrecht auf die Freigabe
+NAS_BENUTZER="scanner"
+NAS_PASSWORT=''
+NAS_DOMAENE=""
+# SMB-Version: 3.0 passt für fast alle NAS. Bei "mount error(95)" oder
+# "error(112)" probiere 2.1 oder 3.1.1.
+SMB_VERSION="3.0"
+
+# Unterordner in der Freigabe, in dem die Scans landen (wird angelegt)
+NAS_UNTERORDNER="Scans"
+
+# Mountpunkt auf dem Proxmox-Host (normalerweise nicht ändern)
+HOST_MOUNTPUNKT="/mnt/scan2nas"
