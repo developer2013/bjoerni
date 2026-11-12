@@ -28,6 +28,9 @@ SCANSERVJS_VERSION="${SCANSERVJS_VERSION:-v3.3.0}"
 KONSOLE_AUTOLOGIN="${KONSOLE_AUTOLOGIN:-nein}"
 
 export DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 LC_ALL=C.UTF-8
+# "pct exec" startet ohne /usr/local/bin im PATH – dort liegen aber scan2nas
+# und scan2nas-kurzbefehl. Deshalb hier vollständig setzen.
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
 info()   { printf '\033[1;34m==>\033[0m %s\n' "$*"; }
 ok()     { printf '\033[1;32m ✔ \033[0m %s\n' "$*"; }

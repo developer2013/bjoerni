@@ -70,7 +70,7 @@ scan2nas --help
 **Vom Proxmox-Host aus, ohne in den Container zu wechseln:**
 
 ```bash
-pct exec <ID> -- scan2nas scannen -q einzug
+pct exec <ID> -- /usr/local/bin/scan2nas scannen -q einzug
 ```
 
 ---

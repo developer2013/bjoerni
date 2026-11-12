@@ -121,6 +121,18 @@ Was sich **nicht** lokal testen lässt: echter Scanner, echtes NAS, Proxmox-Befe
 (`pct`, `pveam`), Debian-Pakete. Änderungen daran nur syntaktisch prüfen und im
 Ergebnis offen sagen, was ungetestet ist.
 
+## Erfahrungen aus dem echten Einsatz (Proxmox VE 9.2, Debian 13)
+
+- **`pct exec` hat `/usr/local/bin` nicht im PATH.** `pct exec 107 -- scan2nas-kurzbefehl`
+  scheitert mit „Failed to exec … No such file or directory“, obwohl die Datei da ist.
+  In Doku und Skripten deshalb immer den **vollen Pfad** angeben; Skripte, die per
+  `pct exec` laufen (`installieren.sh`), setzen den PATH selbst.
+- **Die Proxmox-Shell im Browser endet, sobald man im selben Tab woanders hinklickt**,
+  und reißt ein laufendes Skript mit. Lange Läufe brauchen den Hinweis „Fenster offen lassen“.
+- **DNS im neuen Container kann fehlen**, wenn der Router ein (noch nicht eingerichtetes)
+  AdGuard als DNS verteilt. `netzwerk_pruefen` in `lxc-erstellen.sh` erkennt und behebt das.
+- `perl: warning: Setting locale failed` bei `pct exec` ist harmlos (Host-Locale fehlt im Container).
+
 ## Nützliche Fakten zum Gerät
 
 - Der TR8550 meldet sich per mDNS als **„Canon TR8500 series“**, `_uscan._tcp` auf

@@ -52,8 +52,13 @@ Am Mac in der Proxmox-Oberfläche → Knoten → **Shell** (Host-Shell). Die Zei
 Nummer deines Scanner-Containers ersetzen:
 
 ```bash
-pct exec 107 -- scan2nas-kurzbefehl schluessel 'ssh-ed25519 AAAA…dein-schluessel… Kurzbefehle'
+pct exec 107 -- /usr/local/bin/scan2nas-kurzbefehl schluessel 'ssh-ed25519 AAAA…dein-schluessel… Kurzbefehle'
 ```
+
+> Den **vollen Pfad** `/usr/local/bin/…` mitschreiben. `pct exec` sucht Befehle nicht
+> in `/usr/local/bin`. Ohne Pfad kommt die irreführende Meldung
+> `Failed to exec "scan2nas-kurzbefehl" … No such file or directory`, obwohl die Datei da ist.
+> (Direkt in der Container-Konsole geht es auch ohne Pfad.)
 
 Antwort: `✔ Schlüssel eingetragen. Er darf nur scannen …`
 
