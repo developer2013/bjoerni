@@ -108,6 +108,12 @@ journalctl -u scan2nas -f          # Meldungen live mitlesen
 | [docs/03-benutzung.md](docs/03-benutzung.md) | Weboberfläche, Befehle, Einzug-Automatik, alle Einstellungen |
 | [docs/04-fehlerbehebung.md](docs/04-fehlerbehebung.md) | Wenn etwas nicht klappt |
 
+## Weitere Anleitungen
+
+| Ordner | Inhalt |
+|---|---|
+| [adguard-home/](adguard-home/README.md) | **AdGuard Home auf Proxmox**: Werbung und Tracker im ganzen Heimnetz blocken, mit FRITZ!Box-Einrichtung (IPv4 + IPv6), Filtern, Kindersicherung, Backup und Notfallplan. Bonus: `http://scanner.lan:8080` statt IP-Adresse |
+
 ## Projektaufbau
 
 ```
@@ -130,7 +136,8 @@ bjoerni/
 ├── tests/
 │   ├── test_scan2nas.py               automatische Tests (ohne Scanner/NAS lauffähig)
 │   └── test_einrichten.py             Tests für den Assistenten (simulierte Dialoge)
-└── docs/                              ausführliche Anleitungen
+├── docs/                              ausführliche Anleitungen zu scan2nas
+└── adguard-home/                      eigenständige Anleitung: AdGuard Home auf Proxmox
 ```
 
 ## Wie funktioniert das technisch? (Kurzfassung)

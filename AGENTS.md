@@ -45,6 +45,7 @@ Canon TR8550 ──eSCL (HTTP :80/eSCL)──▶ Container "scanner" ──Bind-
 | `tests/test_scan2nas.py` | unittest, läuft ohne Scanner/NAS (simuliert `scanimage`/`img2pdf`) | überall |
 | `tests/test_einrichten.py` | Tests für `einrichten.sh`: Prüffunktionen, Konfig-Rundreise, kompletter Dialogablauf mit Attrappen (whiptail, pvesm, ip, mount) | überall |
 | `docs/` | Anleitungen für Björn (01 Vorbereitung … 04 Fehlerbehebung) | – |
+| `adguard-home/` | **Eigenständige** Anleitung „AdGuard Home auf Proxmox“ (nur Markdown, kein Code). Nutzt das Community Script `community-scripts/ProxmoxVE/ct/adguard.sh`. Begriffe aus der Oberfläche stammen aus AdGuards `client/src/__locales/de.json`, bei Änderungen dort nachschlagen. Beispiel-IPs: FRITZ!Box `.1`, Proxmox `.5`, Drucker `.50`, AdGuard `.53`, scan2nas `.60` | – |
 
 ## Konventionen
 
