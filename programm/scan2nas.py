@@ -653,6 +653,20 @@ def test(k: Konfiguration) -> int:
     except ScanFehler as fehler:
         zeile(False, str(fehler))
 
+    # Ist die Installation vollständig? (bricht sie mittendrin ab, fehlt oft genau das)
+    hook = Path("/etc/scanservjs/config.local.js")
+    if Path("/etc/scanservjs").is_dir():
+        verbunden = hook.is_file() and "scan2nas" in hook.read_text(encoding="utf-8", errors="replace")
+        zeile(verbunden, "Weboberfläche kopiert jeden Scan aufs NAS" if verbunden else
+              "Weboberfläche ist NICHT mit dem NAS verbunden – Einzeiler erneut ausführen → „Aktualisieren“")
+    if shutil.which("systemctl"):
+        aktiv = subprocess.run(["systemctl", "is-active", "--quiet", "scan2nas"]).returncode == 0
+        zeile(aktiv, "Hintergrunddienst scan2nas läuft" if aktiv else
+              "Hintergrunddienst scan2nas läuft nicht (systemctl status scan2nas)")
+    kurzbefehl = Path("/usr/local/bin/scan2nas-kurzbefehl").exists()
+    zeile(True if kurzbefehl else None, "iPhone-Kurzbefehl-Zugang ist installiert" if kurzbefehl else
+          "iPhone-Kurzbefehl-Zugang fehlt (optional, siehe docs/05-iphone-kurzbefehl.md)")
+
     nas = k.pfad("NAS_ORDNER")
     if nas_verfuegbar(nas):
         probe = nas / ".scan2nas-schreibtest"
