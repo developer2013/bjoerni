@@ -29,7 +29,7 @@ Eine Shell oder andere Befehle sind damit nicht möglich.
    | Feld | Wert |
    |---|---|
    | Skript | erst einmal `status` |
-   | Host | IP des Scanner-Containers, z. B. `192.168.100.60` (dieselbe wie bei der Weboberfläche, ohne `:8080`). Anzeigen auf dem Proxmox-Host: `pct exec 107 -- hostname -I` |
+   | Host | **Nur die IP-Adresse** des Scanner-Containers, z. B. `192.168.100.60`. Das ist dieselbe Adresse wie bei der Weboberfläche, ohne `:8080`. **Nicht** die IP des Druckers! Herausfinden: am Mac in der Proxmox-Shell `pct exec 107 -- hostname -I` eintippen und die **erste Zahl** der Ausgabe hier eintragen, **nicht** den Befehl selbst |
    | Port | `22` |
    | Benutzer:in | `root`, **klein geschrieben und selbst eintippen**. Das graue „Root“ ist nur ein Platzhalter |
    | Authentifizierung | **SSH-Schlüssel**. Steht dort „Passwort“, drauftippen und umstellen. Mit Passwort geht es nicht: root hat keins, und Debian lässt root per SSH nur mit Schlüssel rein |
@@ -142,7 +142,7 @@ Groß-/Kleinschreibung ist egal. Alles andere wird abgelehnt.
 
 | Meldung | Lösung |
 |---|---|
-| „konnte keine Verbindung zum SSH-Server herstellen“ | Meist die **falsche IP** bei *Host*, z. B. die des **Druckers** statt die des Scanner-**Containers**. Richtige IP: `pct exec 107 -- hostname -I`. Sonst prüfen, ob SSH im Container läuft: `pct exec 107 -- systemctl status ssh` |
+| „konnte keine Verbindung zum SSH-Server herstellen“ | Meist die **falsche IP** bei *Host*, z. B. die des **Druckers** statt die des Scanner-**Containers**. Richtige IP: in der **Proxmox-Shell** (nicht im iPhone) `pct exec 107 -- hostname -I` ausführen und die erste Zahl der Ausgabe ins Feld *Host* übernehmen. Sonst prüfen, ob SSH im Container läuft: `pct exec 107 -- systemctl status ssh` |
 | Permission denied (publickey) | Schlüssel nicht (richtig) eingetragen → Schritt 2 wiederholen, die **ganze** Zeile in einfachen Anführungszeichen |
 | `❌ Unbekannter Befehl` | Tippfehler im Feld *Skript*, erlaubt sind nur die Befehle aus der Tabelle |
 | `❌ Scan fehlgeschlagen` + Grund | Grund lesen (z. B. „Liegt Papier im Einzug?“), sonst [Fehlerbehebung](04-fehlerbehebung.md) |
