@@ -28,11 +28,15 @@ Eine Shell oder andere Befehle sind damit nicht möglich.
 
    | Feld | Wert |
    |---|---|
-   | Host | IP des Scanner-Containers, z. B. `192.168.100.60` (dieselbe wie bei der Weboberfläche, ohne `:8080`) |
-   | Port | `22` |
-   | Benutzer | `root` |
-   | Authentifizierung | **SSH-Schlüssel** |
    | Skript | erst einmal `status` |
+   | Host | IP des Scanner-Containers, z. B. `192.168.100.60` (dieselbe wie bei der Weboberfläche, ohne `:8080`). Anzeigen auf dem Proxmox-Host: `pct exec 107 -- hostname -I` |
+   | Port | `22` |
+   | Benutzer:in | `root`, **klein geschrieben und selbst eintippen**. Das graue „Root“ ist nur ein Platzhalter |
+   | Authentifizierung | **SSH-Schlüssel**. Steht dort „Passwort“, drauftippen und umstellen. Mit Passwort geht es nicht: root hat keins, und Debian lässt root per SSH nur mit Schlüssel rein |
+   | Eingabe | **leer lassen**. Wird nicht gebraucht |
+
+   > Graue Werte in den Feldern sind nur Beispiele. Erst wenn der Text weiß ist,
+   > ist wirklich etwas eingetragen.
 
 4. Bei **SSH-Schlüssel** auf den Schlüssel tippen. Das iPhone hat bereits einen
    erzeugt (ed25519). Dort **„Öffentlichen Schlüssel teilen“** wählen und ihn dir
@@ -88,7 +92,9 @@ einsetzen. Kurzbefehl **„Scannen“** nennen, fertig.
   Mitteilung anzeigen          →  [Shell-Skript-Ergebnis]
 ```
 
-So musst du die SSH-Aktion nur **einmal** einrichten.
+So musst du die SSH-Aktion nur **einmal** einrichten. Das **Menüergebnis** gehört ins
+Feld **Skript** (ins Feld tippen → oben „Variable auswählen“ → *Menüergebnis*), **nicht**
+ins Feld „Eingabe“.
 
 ### Alle erlaubten Befehle
 
