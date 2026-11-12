@@ -7,6 +7,38 @@ in deinem Netzwerk** auf einmal: Handy, Smart-TV, Spielekonsole, Laptop. Auf den
 Geräten musst du dafür nichts installieren. Es läuft als kleiner Container auf
 deinem Proxmox und braucht kaum Ressourcen (1 Kern, 512 MB RAM).
 
+## Der schnellste Weg: ein Befehl ⚡
+
+In der Proxmox-Oberfläche → Knoten → **Shell**:
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/developer2013/bjoerni/main/adguard-home/einrichten.sh)"
+```
+
+Der Assistent erledigt die Kapitel 1, 2 und die eigenen Namen aus Kapitel 4 für dich:
+
+- **findet deinen AdGuard-Container** (z. B. vom Community Script) oder legt einen
+  neuen an
+- macht eine DHCP-Adresse auf Wunsch zur **festen IP** und stellt die
+  **Startreihenfolge** ein (AdGuard startet als Erstes)
+- erledigt den **Einrichtungsassistenten**, falls noch offen (du wählst nur
+  Benutzer und Passwort)
+- stellt **verschlüsselte DNS-Server** (Quad9, DNS4EU), DNSSEC, Gerätenamen über
+  den Router und die Ratenlimit-Ausnahme ein
+- fügt **Sperrlisten** hinzu (HaGeZi Pro oder Normal, Threat Intelligence)
+- legt **eigene Namen** an: `scanner.lan`, `drucker.lan`, `nas.lan`, `proxmox.lan`,
+  `adguard.lan`. Was er im Netz findet, schlägt er vor
+- erkennt eine **FRITZ!Box** und zeigt dir am Ende **genau die Werte**, die du dort
+  eintragen musst, inklusive IPv6-Adresse
+
+Nur die Umstellung im Router machst du selbst ([Kapitel 3](03-fritzbox-und-router.md)),
+denn da soll niemand ungefragt in deiner FRITZ!Box herumschalten. Mehrfach ausführen
+ist gefahrlos: Vorhandenes wird erkannt und nicht doppelt angelegt. Dein
+AdGuard-Passwort wird nirgends gespeichert.
+
+Wer verstehen will, was dabei passiert, oder lieber alles von Hand macht, liest
+einfach die Kapitel unten.
+
 ## Wie funktioniert das?
 
 Jedes Gerät fragt vor dem Laden einer Seite einen **DNS-Server**: „Welche Adresse

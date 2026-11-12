@@ -5,6 +5,10 @@
 Wir nutzen das bewährte **Community Script** für AdGuard Home. Es legt einen
 kleinen, unprivilegierten LXC-Container an und installiert AdGuard Home darin.
 
+> ⚡ **Abkürzung:** Der [Einzeiler aus der Übersicht](README.md#der-schnellste-weg-ein-befehl-)
+> erledigt dieses und das nächste Kapitel automatisch. Er kann auch einen per
+> Community Script angelegten AdGuard fertig einrichten.
+
 ---
 
 ## 1. Vorher klären: Welche IP bekommt AdGuard?
