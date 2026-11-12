@@ -317,6 +317,59 @@ EOF
 # ---------------------------------------------------------------------
 #  5. Container starten und scan2nas installieren
 # ---------------------------------------------------------------------
+
+# Prüft Schritt für Schritt: IP-Adresse → Internet → DNS. Jeder Einzeltest hat
+# ein hartes Zeitlimit (timeout 5), damit nichts minutenlang hängt.
+# Funktioniert nur DNS nicht (typisch: der Router verteilt einen DNS-Server,
+# der nicht antwortet – z. B. ein noch nicht eingerichtetes AdGuard Home),
+# bekommt der Container den Router und Quad9 als DNS-Server.
+netzwerk_pruefen() {
+  local i adresse="" gw dns_alt
+  info "Warte auf eine IP-Adresse im Container …"
+  for i in $(seq 1 30); do
+    adresse="$(timeout 5 pct exec "$CT_ID" -- ip -4 addr show eth0 2>/dev/null | awk '/inet / {print $2; exit}' || true)"
+    if [[ -n $adresse ]]; then break; fi
+    sleep 2
+  done
+  [[ -n $adresse ]] || fehler "Der Container hat nach 60 Sekunden keine IP-Adresse. Bei DHCP: Gibt der Router Adressen an neue Geräte? Sonst CT_IP fest setzen. Stimmt CT_BRIDGE ($CT_BRIDGE)?"
+  ok "Container hat die IP-Adresse $adresse"
+
+  info "Prüfe die Internetverbindung …"
+  for i in $(seq 1 10); do
+    if timeout 5 pct exec "$CT_ID" -- bash -c 'exec 3<>/dev/tcp/9.9.9.9/443 || exec 3<>/dev/tcp/1.1.1.1/443' >/dev/null 2>&1; then
+      break
+    fi
+    [[ $i -lt 10 ]] || fehler "Der Container erreicht das Internet nicht (IP $adresse). Gateway prüfen: $(timeout 5 pct exec "$CT_ID" -- ip route 2>/dev/null | awk '/^default/ {print "default via " $3}' || true)"
+    sleep 2
+  done
+  ok "Internet ist erreichbar"
+
+  info "Prüfe die Namensauflösung (DNS) …"
+  for i in 1 2 3; do
+    if timeout 5 pct exec "$CT_ID" -- getent hosts deb.debian.org >/dev/null 2>&1; then
+      ok "DNS funktioniert"
+      return 0
+    fi
+    sleep 2
+  done
+
+  dns_alt="$(timeout 5 pct exec "$CT_ID" -- awk '/^nameserver/ {printf "%s ", $2}' /etc/resolv.conf 2>/dev/null || true)"
+  gw="$(timeout 5 pct exec "$CT_ID" -- ip route 2>/dev/null | awk '/^default/ {print $3; exit}' || true)"
+  warn "Im Container funktioniert DNS nicht (eingetragen: ${dns_alt:-nichts})."
+  warn "Häufigster Grund: Der Router verteilt einen DNS-Server, der nicht antwortet – z. B. ein AdGuard Home, dessen Einrichtung noch nicht abgeschlossen ist."
+  info "Stelle für diesen Container den Router${gw:+ ($gw)} und Quad9 (9.9.9.9) als DNS-Server ein …"
+  pct set "$CT_ID" --nameserver "${gw:+$gw }9.9.9.9"
+  timeout 5 pct exec "$CT_ID" -- bash -c "printf 'nameserver %s\n' ${gw:+$gw} 9.9.9.9 > /etc/resolv.conf" || true
+  for i in 1 2 3; do
+    if timeout 5 pct exec "$CT_ID" -- getent hosts deb.debian.org >/dev/null 2>&1; then
+      ok "DNS funktioniert jetzt"
+      return 0
+    fi
+    sleep 2
+  done
+  fehler "DNS funktioniert im Container auch mit 9.9.9.9 nicht. Blockiert eine Firewall Port 53? Hilfe: docs/04-fehlerbehebung.md"
+}
+
 im_container_installieren() {
   if [[ "$(pct status "$CT_ID")" == *running* ]]; then
     info "Starte Container $CT_ID neu (damit er das NAS sicher sieht) …"
@@ -326,14 +379,7 @@ im_container_installieren() {
     pct start "$CT_ID"
   fi
 
-  info "Warte auf Internet im Container …"
-  local i
-  for i in $(seq 1 60); do
-    if pct exec "$CT_ID" -- getent hosts deb.debian.org >/dev/null 2>&1; then break; fi
-    [[ $i -lt 60 ]] || fehler "Der Container hat nach 2 Minuten noch kein Internet – CT_IP, CT_GATEWAY und CT_BRIDGE prüfen."
-    sleep 2
-  done
-  ok "Netzwerk ist da"
+  netzwerk_pruefen
 
   info "Kopiere die Projektdateien in den Container …"
   local paket
