@@ -1,7 +1,7 @@
 # 5. Scannen per iPhone-Kurzbefehl (und Siri)
 
 Mit einem Kurzbefehl auf dem iPhone startest du den Scan mit einem Fingertipp, vom
-Home-Bildschirm, per Siri („Hey Siri, Scannen“) oder sogar per NFC-Aufkleber am
+Home-Bildschirm, per Siri („Hey Siri, Einzug scannen“) oder sogar per NFC-Aufkleber am
 Drucker. Das Ergebnis erscheint als Mitteilung:
 
 ```
@@ -81,8 +81,10 @@ Klappt das, ist alles verbunden. 🎉
 ### Variante „Ein Knopf“ (am einfachsten)
 
 Im Feld **Skript** einfach `einzug` eintragen. Dann noch eine Aktion
-**Mitteilung anzeigen** dahinter und als Text die Variable **Shell-Skript-Ergebnis**
-einsetzen. Kurzbefehl **„Scannen“** nennen, fertig.
+**Ergebnis anzeigen** dahinter und als Inhalt die Variable **Shell-Skript-Ergebnis**
+einsetzen. Kurzbefehl **„Einzug scannen“** nennen, fertig. (Mit „Ergebnis anzeigen“
+liest Siri das Ergebnis auch vor. „Mitteilung anzeigen“ geht ebenfalls, zeigt es
+aber nur als Banner.)
 
 ### Variante „Mit Auswahl“
 
@@ -94,7 +96,7 @@ einsetzen. Kurzbefehl **„Scannen“** nennen, fertig.
 │   • Foto (600 dpi)           →  Text: foto
 └ Ende des Menüs
   Skript über SSH ausführen    →  Skript: [Menüergebnis]
-  Mitteilung anzeigen          →  [Shell-Skript-Ergebnis]
+  Ergebnis anzeigen            →  [Shell-Skript-Ergebnis]
 ```
 
 So musst du die SSH-Aktion nur **einmal** einrichten. Das **Menüergebnis** gehört ins
@@ -118,7 +120,18 @@ Groß-/Kleinschreibung ist egal. Alles andere wird abgelehnt.
 
 ## Ideen zum Starten
 
-- **Siri:** „Hey Siri, Scannen“. Der Name des Kurzbefehls ist das Sprachkommando.
+- **Siri:** Der **Name des Kurzbefehls ist das Sprachkommando**, extra einschalten
+  muss man nichts.
+  1. Im Kurzbefehl oben auf den Namen tippen → **Umbenennen**, z. B. „Einzug scannen“
+  2. „**Hey Siri, Einzug scannen**“. Beim ersten Mal die Verbindung mit
+     **„Immer erlauben“** bestätigen
+  3. Für das Vorlagenglas: in der Übersicht lange auf den Kurzbefehl drücken →
+     **Duplizieren** → „Glas scannen“ nennen, Skript `glas`
+
+  Nur „Scannen“ als Name besser vermeiden. Siri verwechselt das leicht mit dem
+  eingebauten „Dokument scannen“ der Notizen-App. Bei gesperrtem iPhone will Siri
+  eventuell erst entsperrt werden. Mit der Menü-Variante fragt Siri „Was scannen?“,
+  dann einfach „Einzug“ oder „Glas“ sagen.
 - **Home-Bildschirm:** im Kurzbefehl auf ⓘ → **Zum Home-Bildschirm**
 - **Action-Taste** (iPhone 15 Pro und neuer): Einstellungen → Action-Taste → Kurzbefehl
 - **Zurücktippen:** Einstellungen → Bedienungshilfen → Tippen → Auf Rückseite tippen

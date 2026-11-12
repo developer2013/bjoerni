@@ -21,7 +21,7 @@ flowchart LR
 | Weg | So geht's | Gut für |
 |---|---|---|
 | **Weboberfläche** | Im Browser `http://<container-ip>:8080` öffnen und auf **Scannen** tippen | Alltag, auch vom Handy aus |
-| **iPhone-Kurzbefehl / Siri** | „Hey Siri, Scannen“, Home-Bildschirm-Knopf oder NFC-Aufkleber am Drucker ([Anleitung](docs/05-iphone-kurzbefehl.md)) | Der bequemste Weg |
+| **iPhone-Kurzbefehl / Siri** | „Hey Siri, Einzug scannen“, Home-Bildschirm-Knopf oder NFC-Aufkleber am Drucker ([Anleitung](docs/05-iphone-kurzbefehl.md)) | Der bequemste Weg |
 | **Befehl** | `scan2nas scannen` oder `scan2nas scannen -q einzug` | Skripte, Automatisierung |
 | **Einzug-Automatik** *(optional)* | Papier oben in den Einzug legen, nach 15 Sekunden wird gescannt | Viel Papier archivieren |
 
