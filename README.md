@@ -116,6 +116,12 @@ journalctl -u scan2nas -f          # Meldungen live mitlesen
 |---|---|
 | [adguard-home/](adguard-home/README.md) | **AdGuard Home auf Proxmox**: Werbung und Tracker im ganzen Heimnetz blocken, mit FRITZ!Box-Einrichtung (IPv4 + IPv6), Filtern, Kindersicherung, Backup und Notfallplan. Bonus: `http://scanner.lan:8080` statt IP-Adresse. **Auch als Einzeiler:** `bash -c "$(curl -fsSL https://raw.githubusercontent.com/developer2013/bjoerni/main/adguard-home/einrichten.sh)"` |
 
+## Ideen für später
+
+| Idee | Stand |
+|---|---|
+| [Scans automatisch an Paperless-ngx schicken](ideen/paperless-ngx.md) | Konzept steht, Tag „Scanner“ entschieden, noch nicht umgesetzt |
+
 ## Projektaufbau
 
 ```
