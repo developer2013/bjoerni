@@ -12,6 +12,8 @@
 #      SCANNER_NAME        Anzeigename (Standard: "Canon TR8550")
 #      NAS_ORDNER          Zielordner im Container (Standard: /mnt/nas/Scans)
 #      SCANSERVJS_VERSION  z. B. v3.3.0 oder "latest" (Standard: v3.3.0)
+#      KONSOLE_AUTOLOGIN   ja = Proxmox-Konsole meldet automatisch als root an
+#                          (Standard: nein)
 #
 #  Das Skript kann gefahrlos mehrfach ausgeführt werden (z. B. für Updates).
 #  Eine vorhandene /etc/scan2nas/scan2nas.conf wird NICHT überschrieben.
@@ -23,6 +25,7 @@ SCANNER_IP="${SCANNER_IP:-}"
 SCANNER_NAME="${SCANNER_NAME:-Canon TR8550}"
 NAS_ORDNER="${NAS_ORDNER:-/mnt/nas/Scans}"
 SCANSERVJS_VERSION="${SCANSERVJS_VERSION:-v3.3.0}"
+KONSOLE_AUTOLOGIN="${KONSOLE_AUTOLOGIN:-nein}"
 
 export DEBIAN_FRONTEND=noninteractive LANG=C.UTF-8 LC_ALL=C.UTF-8
 
@@ -156,7 +159,31 @@ systemctl restart scanservjs scan2nas
 ok "scanservjs und scan2nas laufen"
 
 # ---------------------------------------------------------------------
-#  7. Selbsttest
+#  7. Proxmox-Konsole (Autologin)
+# ---------------------------------------------------------------------
+GETTY_DIR=/etc/systemd/system/container-getty@1.service.d
+if [[ $KONSOLE_AUTOLOGIN == ja ]]; then
+  mkdir -p "$GETTY_DIR"
+  cat > "$GETTY_DIR/scan2nas-autologin.conf" <<'EOF'
+# Von scan2nas angelegt: Die Proxmox-Konsole meldet automatisch als root an,
+# weil für den Container kein Passwort gesetzt ist. An die Konsole kommt
+# ohnehin nur, wer in Proxmox selbst angemeldet ist.
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty --autologin root --noclear --keep-baud tty%I 115200,38400,9600 $TERM
+EOF
+  systemctl daemon-reload
+  systemctl restart container-getty@1.service 2>/dev/null || true
+  ok "Proxmox-Konsole meldet automatisch als root an"
+elif [[ -f $GETTY_DIR/scan2nas-autologin.conf ]]; then
+  rm -f "$GETTY_DIR/scan2nas-autologin.conf"
+  systemctl daemon-reload
+  systemctl restart container-getty@1.service 2>/dev/null || true
+  ok "Autologin der Konsole abgeschaltet"
+fi
+
+# ---------------------------------------------------------------------
+#  8. Selbsttest
 # ---------------------------------------------------------------------
 echo
 scan2nas test || warn "Der Selbsttest hat Probleme gefunden – siehe docs/04-fehlerbehebung.md"

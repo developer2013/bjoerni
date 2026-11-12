@@ -110,14 +110,36 @@ Zwei Werte aus `proxmox.conf` solltest du kurz prüfen:
 
 ## 4. Zugriff auf dieses Repository
 
-Das Repository `developer2013/bjoerni` ist **privat**.
+**Für den Einzeiler brauchst du nichts weiter.** Der curl-Befehl aus der
+[README](../README.md#schnellstart-ein-einziger-befehl) lädt alles selbst herunter.
 
-**Schritt 1 (Carsten):** Auf GitHub im Repository unter *Settings → Collaborators →
-Add people* Björns GitHub-Konto einladen. Björn nimmt die Einladung per E-Mail an.
+**Nur falls das Repository privat ist:** curl kann dann nicht darauf zugreifen,
+weil GitHub private Dateien nur an angemeldete Nutzer ausliefert. Auch eine
+Einladung als Mitarbeiter ändert daran nichts. Am einfachsten geht es dann mit der
+GitHub-CLI. Du meldest dich einmal per Browser-Code an und musst keinen Token
+abtippen:
 
-**Schritt 2 (Björn):** Das Repository auf den Proxmox-Host holen. Dafür gibt es drei Wege:
+```bash
+apt install -y gh
+gh auth login      # GitHub.com → HTTPS → "Login with a web browser" → Code auf github.com/login/device eingeben
+bash -c "$(gh api -H 'Accept: application/vnd.github.v3.raw' repos/developer2013/bjoerni/contents/einrichten.sh)"
+```
 
-**a) Mit Zugriffstoken (empfohlen):**
+Der Assistent nutzt die gh-Anmeldung danach automatisch auch für den Download.
+
+### Projekt als Ordner auf den Host holen (für die Wege B und C)
+
+Willst du lieber mit der Konfigurationsdatei arbeiten oder alles von Hand machen
+(siehe [Installation](02-installation.md)), brauchst du das Projekt als Ordner.
+
+**a) Öffentliches Repository:**
+
+```bash
+apt install -y git
+git clone https://github.com/developer2013/bjoerni.git
+```
+
+**b) Privates Repository mit Zugriffstoken:**
 Auf GitHub *Settings → Developer settings → Personal access tokens →
 Fine-grained tokens → Generate new token*. Unter *Repository access* nur `bjoerni`
 auswählen, bei *Permissions → Contents* **Read-only** setzen. Dann auf dem Host:
@@ -129,7 +151,7 @@ git clone https://github.com/developer2013/bjoerni.git
 # Passwort:     der Token (nicht dein GitHub-Passwort!)
 ```
 
-**b) Mit der GitHub-CLI:**
+**c) Privates Repository mit der GitHub-CLI:**
 
 ```bash
 apt install -y gh git
@@ -137,7 +159,7 @@ gh auth login          # Anweisungen folgen
 gh repo clone developer2013/bjoerni
 ```
 
-**c) Als ZIP:** Auf GitHub *Code → Download ZIP*, dann vom PC auf den Host kopieren:
+**d) Als ZIP:** Auf GitHub *Code → Download ZIP*, dann vom PC auf den Host kopieren:
 
 ```bash
 scp bjoerni-main.zip root@<PROXMOX-IP>:/root/

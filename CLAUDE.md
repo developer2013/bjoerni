@@ -16,6 +16,8 @@ werden hier eingebunden:
   ```
 - **shellcheck ist lokal nicht installiert**, daher `bash -n` für die Shell-Skripte.
 - **Commit und Push nur auf ausdrückliche Anweisung.** Commit-Messages auf Deutsch.
-  Remote: `https://github.com/developer2013/bjoerni` (privat), Branch `main`.
+  Remote: `https://github.com/developer2013/bjoerni`, Branch `main`.
+  Der Einzeiler lädt `einrichten.sh` direkt von `main` – alles, was dort landet,
+  ist sofort „live“ für Björn. Vor jedem Push also die Tests laufen lassen.
 - Wenn du Doku änderst: Björn liest sie. Lieber kurze Sätze und konkrete Befehle zum
   Kopieren als Theorie.

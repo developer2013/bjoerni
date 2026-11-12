@@ -43,6 +43,9 @@ CT_DISK="8"        # GB
 CT_PASSWORT=""
 # Optional: Datei mit öffentlichem SSH-Schlüssel, z. B. "/root/.ssh/id_ed25519.pub"
 CT_SSH_SCHLUESSEL=""
+# Proxmox-Konsole meldet automatisch als root an: ja | nein
+# Leer = "ja", wenn kein CT_PASSWORT gesetzt ist (wie bei den Community Scripts).
+KONSOLE_AUTOLOGIN=""
 
 # ---------------------------------------------------------------------
 #  Scanner

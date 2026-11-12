@@ -54,6 +54,11 @@ CT_SWAP="${CT_SWAP:-512}"
 CT_DISK="${CT_DISK:-8}"
 CT_PASSWORT="${CT_PASSWORT:-}"
 CT_SSH_SCHLUESSEL="${CT_SSH_SCHLUESSEL:-}"
+if [[ -z ${CT_PASSWORT} ]]; then
+  KONSOLE_AUTOLOGIN="${KONSOLE_AUTOLOGIN:-ja}"
+else
+  KONSOLE_AUTOLOGIN="${KONSOLE_AUTOLOGIN:-nein}"
+fi
 SCANNER_IP="${SCANNER_IP:-}"
 NAS_TYP="${NAS_TYP:-cifs}"
 NAS_SERVER="${NAS_SERVER:-}"
@@ -326,6 +331,7 @@ im_container_installieren() {
   info "Installiere scan2nas im Container (dauert beim ersten Mal ein paar Minuten) …"
   pct exec "$CT_ID" -- env LANG=C.UTF-8 LC_ALL=C.UTF-8 \
     SCANNER_IP="$SCANNER_IP" NAS_ORDNER="$CT_MOUNTPUNKT/$NAS_UNTERORDNER" \
+    KONSOLE_AUTOLOGIN="$KONSOLE_AUTOLOGIN" \
     bash /root/scan2nas-quelle/installation/installieren.sh
 }
 

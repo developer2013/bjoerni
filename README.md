@@ -40,48 +40,51 @@ Und das passiert mit jedem Scan:
 - Den Canon TR8550 im selben Netzwerk, **mit fester IP-Adresse** (im Router einstellen)
 - Ein NAS mit einer Freigabe (SMB oder NFS) und einem Benutzer, der dort schreiben darf
 
-## Schnellstart (ca. 15 Minuten)
+## Schnellstart: ein einziger Befehl
 
-> Ausführlich mit Bildschirm-Beschreibungen: **[docs/01-vorbereitung.md](docs/01-vorbereitung.md)**
-> und **[docs/02-installation.md](docs/02-installation.md)**
-
-**1. Vorbereiten:** Scanner bekommt eine feste IP, auf dem NAS gibt es die Freigabe
-`scans` und einen Benutzer `scanner`.
-
-**2. Projekt auf den Proxmox-Host holen** (Shell des Hosts, als root):
+In der Proxmox-Oberfläche links auf deinen **Knoten** klicken → **Shell**, dann
+diesen Befehl einfügen und Enter drücken:
 
 ```bash
-apt install -y git
-git clone https://github.com/developer2013/bjoerni.git
-cd bjoerni
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/developer2013/bjoerni/main/einrichten.sh)"
 ```
 
-> Das Repository ist privat. Wie du Zugriff bekommst, steht in
-> [docs/01-vorbereitung.md](docs/01-vorbereitung.md#4-zugriff-auf-dieses-repository).
+Ein Assistent führt dich durch alles, so wie bei den bekannten
+[Proxmox Community Scripts](https://community-scripts.github.io/ProxmoxVE/):
 
-**3. Einstellungen eintragen:**
+1. **Einfach oder erweitert?** Bei *Einfach* wählt er Speicher, Netzwerk und
+   Container-Größe selbst.
+2. **Scanner:** Er **sucht deinen Drucker automatisch** im Netzwerk, du wählst ihn
+   nur noch aus.
+3. **NAS:** Adresse, Freigabe, Benutzer und Passwort. Der Zugang wird **sofort
+   getestet**. Bei einem Fehler sagt er dir, woran es liegt, und du kannst es
+   korrigieren.
+4. **Zusammenfassung:** Erst wenn du hier „Ja“ sagst, wird etwas verändert.
 
-```bash
-cp proxmox/proxmox.conf.beispiel proxmox/proxmox.conf
-nano proxmox/proxmox.conf      # Scanner-IP, NAS-Adresse, Freigabe, Benutzer, Passwort
-```
-
-**4. Alles einrichten lassen:**
-
-```bash
-./proxmox/lxc-erstellen.sh
-```
-
-Das Skript hängt das NAS ein, legt den Container an, installiert alles und macht
-am Ende einen Selbsttest. Zum Schluss zeigt es dir die Adresse der Weboberfläche an.
-
-**5. Testscan:** Weboberfläche öffnen, Blatt auf das Glas legen, **Scannen** klicken
+Danach dauert es 5 bis 10 Minuten. Am Ende siehst du die Adresse der Weboberfläche.
+**Testscan:** Weboberfläche öffnen, Blatt auf das Glas legen, **Scannen** klicken
 und auf dem NAS im Ordner `Scans` nachschauen. 🎉
+
+**Update:** Denselben Befehl noch einmal ausführen und **„Aktualisieren“** wählen.
+
+> **Repository privat?** Dann funktioniert `curl` nicht, weil GitHub private Dateien
+> nur an angemeldete Nutzer ausliefert. Melde dich stattdessen einmal mit der
+> GitHub-CLI an (ein Code im Browser, kein Token nötig):
+>
+> ```bash
+> apt install -y gh && gh auth login
+> bash -c "$(gh api -H 'Accept: application/vnd.github.v3.raw' repos/developer2013/bjoerni/contents/einrichten.sh)"
+> ```
+
+> **Vorsicht ist gut:** Wer Skripte aus dem Internet ausführt, sollte sie sich vorher
+> ansehen: [`einrichten.sh`](einrichten.sh). Andere Wege (Konfigurationsdatei,
+> manuell) stehen in [docs/02-installation.md](docs/02-installation.md).
 
 ## Spickzettel
 
-Die Befehle laufen **im Container**. Dorthin kommst du mit `pct enter <ID>` auf dem
-Host oder über die Konsole in der Proxmox-Oberfläche.
+Die Befehle laufen **im Container**. Dorthin kommst du über die **Konsole** des
+Containers in der Proxmox-Oberfläche (du bist automatisch als root angemeldet) oder
+mit `pct enter <ID>` auf dem Host.
 
 ```bash
 scan2nas test                      # Prüft alles: Scanner, NAS, Programme
@@ -101,7 +104,7 @@ journalctl -u scan2nas -f          # Meldungen live mitlesen
 | Datei | Inhalt |
 |---|---|
 | [docs/01-vorbereitung.md](docs/01-vorbereitung.md) | Scanner-IP, NAS-Freigabe, Proxmox, Zugriff aufs Repository |
-| [docs/02-installation.md](docs/02-installation.md) | Automatische und manuelle Installation, Updates, Deinstallation |
+| [docs/02-installation.md](docs/02-installation.md) | Einzeiler, Konfigurationsdatei, manuelle Installation, Updates, Deinstallation |
 | [docs/03-benutzung.md](docs/03-benutzung.md) | Weboberfläche, Befehle, Einzug-Automatik, alle Einstellungen |
 | [docs/04-fehlerbehebung.md](docs/04-fehlerbehebung.md) | Wenn etwas nicht klappt |
 
@@ -111,6 +114,7 @@ journalctl -u scan2nas -f          # Meldungen live mitlesen
 bjoerni/
 ├── README.md                          ← du bist hier
 ├── AGENTS.md / CLAUDE.md              Hinweise für KI-Assistenten, die am Projekt mitarbeiten
+├── einrichten.sh                      der Assistent für den Einzeiler (Dialoge, Scanner-Suche, NAS-Test)
 ├── proxmox/
 │   ├── lxc-erstellen.sh               läuft auf dem Proxmox-Host: NAS, Container, Installation
 │   └── proxmox.conf.beispiel          Vorlage für deine Einstellungen
@@ -124,7 +128,8 @@ bjoerni/
 ├── systemd/
 │   └── scan2nas.service               Hintergrunddienst im Container
 ├── tests/
-│   └── test_scan2nas.py               automatische Tests (ohne Scanner/NAS lauffähig)
+│   ├── test_scan2nas.py               automatische Tests (ohne Scanner/NAS lauffähig)
+│   └── test_einrichten.py             Tests für den Assistenten (simulierte Dialoge)
 └── docs/                              ausführliche Anleitungen
 ```
 

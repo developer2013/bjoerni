@@ -1,17 +1,79 @@
 # 2. Installation
 
-Es gibt zwei Wege:
+Es gibt drei Wege:
 
-- **[A. Automatisch](#a-automatische-installation-empfohlen)**: Ein Skript auf dem
-  Proxmox-Host erledigt alles (empfohlen).
-- **[B. Von Hand](#b-manuelle-installation)**: Für den Fall, dass du jeden Schritt
-  selbst machen willst oder schon einen Container hast.
+- **[A. Einzeiler mit Assistent](#a-einzeiler-mit-assistent-empfohlen)**: ein Befehl,
+  Dialogfenster, fertig (empfohlen).
+- **[B. Mit Konfigurationsdatei](#b-mit-konfigurationsdatei)**: Du trägst alles in
+  eine Datei ein und startest ein Skript. Gut, wenn du es wiederholbar haben willst.
+- **[C. Von Hand](#c-manuelle-installation)**: Jeden Schritt selbst machen, z. B.
+  wenn du schon einen Container hast.
+
+Alle drei Wege führen zum selben Ergebnis. A ruft intern B auf.
 
 ---
 
-## A. Automatische Installation (empfohlen)
+## A. Einzeiler mit Assistent (empfohlen)
 
-Auf dem **Proxmox-Host** als root, im Projektordner:
+In der **Shell des Proxmox-Hosts** (Proxmox-Oberfläche → Knoten → *Shell*):
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/developer2013/bjoerni/main/einrichten.sh)"
+```
+
+> Wichtig: genau so starten, also `bash -c "$(curl …)"` und **nicht**
+> `curl … | bash`. Sonst können die Dialogfenster keine Eingaben lesen.
+> Bei einem privaten Repository: siehe
+> [Vorbereitung, Abschnitt 4](01-vorbereitung.md#4-zugriff-auf-dieses-repository).
+
+### Die Dialoge im Überblick
+
+| Schritt | Was du siehst | Hinweis |
+|---|---|---|
+| 1 | **Willkommen** | Bis zur Zusammenfassung wird nichts verändert, Abbrechen ist jederzeit möglich |
+| 2 | **Einfach / Erweitert** | *Einfach*: Speicher, Netzbrücke, 2 Kerne, 1 GB RAM, 8 GB Platte werden automatisch gewählt. *Erweitert*: Name, ID, Speicher, feste IP, VLAN, Ressourcen, root-Passwort |
+| 3 | **Scanner-Suche** | Durchsucht das Netz des Hosts (`x.x.x.1–254`) nach eSCL-Scannern. Wird keiner gefunden, gibst du die IP selbst ein |
+| 4 | **NAS** | SMB oder NFS, Adresse, Freigabe, Benutzer, Passwort, Ordner. Danach wird **testweise eingehängt**. Passt die SMB-Version nicht, probiert der Assistent selbst 3.1.1 und 2.1 |
+| 5 | **Zusammenfassung** | Mit „Ja“ geht's los |
+
+Danach läuft die Einrichtung genau wie bei [Weg B](#was-das-skript-macht).
+
+Deine Eingaben speichert der Assistent in **`/root/.scan2nas/proxmox.conf`**
+(nur für root lesbar). So musst du bei einem Update nichts neu eingeben, und nach
+einem Fehler kannst du mit „Einstellungen ändern“ genau dort weitermachen.
+
+### Update und Änderungen
+
+Denselben Befehl noch einmal ausführen. Der Assistent erkennt die vorhandene
+Einrichtung und fragt:
+
+- **Aktualisieren**: neueste Version installieren, Einstellungen behalten
+- **Einstellungen ändern**: alle Dialoge, deine bisherigen Werte sind vorausgefüllt
+  (Passwort leer lassen = altes behalten)
+
+### Für Fortgeschrittene: ohne Dialoge
+
+```bash
+SCAN2NAS_KONFIG=/root/meine.conf bash -c "$(curl -fsSL https://raw.githubusercontent.com/developer2013/bjoerni/main/einrichten.sh)"
+```
+
+Die Datei hat dasselbe Format wie `proxmox/proxmox.conf.beispiel`. Mit
+`SCAN2NAS_REF=<branch>` installierst du einen anderen Branch.
+
+### Konsole ohne Passwort
+
+Setzt du kein root-Passwort für den Container (Standard), meldet dich die
+**Konsole in der Proxmox-Oberfläche automatisch als root an**. So machen es auch
+die Community Scripts. An diese Konsole kommt ohnehin nur, wer in Proxmox selbst
+angemeldet ist. Abschalten: in `/root/.scan2nas/proxmox.conf`
+`KONSOLE_AUTOLOGIN=nein` setzen und „Aktualisieren“ ausführen.
+
+---
+
+## B. Mit Konfigurationsdatei
+
+Auf dem **Proxmox-Host** als root, im Projektordner (wie du ihn bekommst, steht in
+[Vorbereitung, Abschnitt 4](01-vorbereitung.md#projekt-als-ordner-auf-den-host-holen-für-die-wege-b-und-c)):
 
 ```bash
 cd ~/bjoerni
@@ -91,7 +153,9 @@ zum Startbildschirm hinzufügen.
 
 ## Updates einspielen
 
-Auf dem Proxmox-Host:
+Mit dem Einzeiler: einfach noch einmal ausführen → **Aktualisieren** (siehe oben).
+
+Mit Konfigurationsdatei, auf dem Proxmox-Host:
 
 ```bash
 cd ~/bjoerni
@@ -106,15 +170,15 @@ ihn neu und installiert die aktuelle Version. Deine Einstellungen in
 
 ---
 
-## B. Manuelle Installation
+## C. Manuelle Installation
 
-### B1. Container anlegen (Proxmox-Oberfläche)
+### C1. Container anlegen (Proxmox-Oberfläche)
 
 *Erstelle CT* → Hostname `scanner`, **Unprivilegierter Container: ja**,
 **Nesting: ja** → Template `debian-13-standard` → 8 GB Platte → 2 Kerne → 1024 MB RAM
 → Netzwerk `vmbr0`, DHCP oder feste IP → fertig. Den Container noch **nicht** starten.
 
-### B2. NAS auf dem Host einhängen
+### C2. NAS auf dem Host einhängen
 
 ```bash
 # Zugangsdaten (nur für root lesbar)
@@ -134,14 +198,14 @@ mkdir -p /mnt/scan2nas/Scans
 `uid=100000,gid=100000` sorgt dafür, dass die Dateien im Container *root* gehören.
 `file_mode=0666,dir_mode=0777` erlaubt auch dem Benutzer der Weboberfläche das Schreiben.
 
-### B3. NAS in den Container durchreichen
+### C3. NAS in den Container durchreichen
 
 ```bash
 pct set <ID> -mp0 /mnt/scan2nas,mp=/mnt/nas
 pct start <ID>
 ```
 
-### B4. Im Container installieren
+### C4. Im Container installieren
 
 Projektdateien in den Container bringen, z. B. vom Host aus:
 
@@ -179,6 +243,7 @@ rm -f /etc/systemd/system/scan2nas-nas-waechter.{service,timer} \
 umount /mnt/scan2nas
 nano /etc/fstab        # die Zeile mit /mnt/scan2nas und den Kommentar darüber löschen
 rm -f /root/.scan2nas-smb
+rm -rf /root/.scan2nas        # gespeicherte Eingaben des Assistenten
 systemctl daemon-reload
 ```
 

@@ -35,6 +35,7 @@ Canon TR8550 ──eSCL (HTTP :80/eSCL)──▶ Container "scanner" ──Bind-
 
 | Pfad | Inhalt | Läuft wo |
 |---|---|---|
+| `einrichten.sh` | Einzeiler-Assistent (whiptail): Scanner-Suche, NAS-Test, speichert `/root/.scan2nas/proxmox.conf`, lädt das Repo und ruft `lxc-erstellen.sh` auf | Proxmox-Host, per `bash -c "$(curl …)"` |
 | `programm/scan2nas.py` | Hauptprogramm (CLI + Dienst), eine Datei | Container → `/opt/scan2nas/`, Link `/usr/local/bin/scan2nas` |
 | `proxmox/lxc-erstellen.sh` | Einrichtung auf dem Host: NAS, Container, Bind-Mount, Wächter, Installation | Proxmox-Host |
 | `proxmox/proxmox.conf.beispiel` | Vorlage für Host-Einstellungen (echte `proxmox.conf` ist gitignored) | Host |
@@ -42,6 +43,7 @@ Canon TR8550 ──eSCL (HTTP :80/eSCL)──▶ Container "scanner" ──Bind-
 | `konfiguration/` | `scan2nas.conf.beispiel` (→ `/etc/scan2nas/scan2nas.conf`), scanservjs-Hook | Container |
 | `systemd/scan2nas.service` | Hintergrunddienst | Container |
 | `tests/test_scan2nas.py` | unittest, läuft ohne Scanner/NAS (simuliert `scanimage`/`img2pdf`) | überall |
+| `tests/test_einrichten.py` | Tests für `einrichten.sh`: Prüffunktionen, Konfig-Rundreise, kompletter Dialogablauf mit Attrappen (whiptail, pvesm, ip, mount) | überall |
 | `docs/` | Anleitungen für Björn (01 Vorbereitung … 04 Fehlerbehebung) | – |
 
 ## Konventionen
@@ -60,6 +62,16 @@ Canon TR8550 ──eSCL (HTTP :80/eSCL)──▶ Container "scanner" ──Bind-
   `scan2nas.py`, `konfiguration/scan2nas.conf.beispiel` (mit Erklärung) und die
   Tabelle in `docs/03-benutzung.md`. Ein Test prüft, dass Code und Beispieldatei
   übereinstimmen.
+- Neue **Host**-Einstellung (für `lxc-erstellen.sh`)? Dann in `proxmox/proxmox.conf.beispiel`,
+  in den Standardwerten von `lxc-erstellen.sh` und in `KONFIG_VARIABLEN` +
+  `standardwerte_setzen` von `einrichten.sh`. Auch hier prüft ein Test die Übereinstimmung.
+- **`einrichten.sh`:** Dialog-Helfer (`eingabe`, `passwort`, `auswahl`) schreiben ihr
+  Ergebnis per `printf -v` in eine Variable, statt es auszugeben. Nur so kann
+  `abbruch` das Skript beenden (aus `$(…)` heraus ginge das nicht). Gespeichert wird mit
+  `printf '%s=%q'`, damit `source` auch Passwörter mit Sonderzeichen exakt zurückliest.
+  Ganz unten verhindert `SCAN2NAS_NUR_LADEN=1`, dass `main` läuft (für die Tests).
+- **Die Einzeiler-URL ist öffentlich dokumentiert:** `einrichten.sh` im Wurzelordner,
+  Branch `main`. Nicht umbenennen oder verschieben.
 - Versionsnummer: `VERSION` in `programm/scan2nas.py`.
 
 ## Unverrückbare Regeln (Invarianten)
@@ -76,7 +88,9 @@ Canon TR8550 ──eSCL (HTTP :80/eSCL)──▶ Container "scanner" ──Bind-
 5. **Der scanservjs-Hook darf einen Scan nie scheitern lassen** (Promise löst immer auf).
 6. **Keine Geheimnisse ins Repo oder in den Container:** `proxmox.conf` ist gitignored,
    `lxc-erstellen.sh` kopiert per `tar --exclude='*.conf'`. SMB-Zugangsdaten liegen
-   nur in `/root/.scan2nas-smb` (0600) auf dem Host.
+   nur in `/root/.scan2nas-smb` und `/root/.scan2nas/proxmox.conf` (beide 0600) auf dem
+   Host. Beim NAS-Test in `einrichten.sh` steht das Passwort in einer temporären
+   `mktemp`-Datei (0600), nie auf der Kommandozeile.
 7. **Rechte:** scan2nas setzt `umask 002`; `/var/lib/scan2nas` gehört `root:users`
    mit setgid (2775), damit root (CLI) und `scanservjs` (Dienst/Web) beide schreiben können.
 8. **XML vom Scanner:** DOCTYPE/ENTITY werden vor dem Parsen abgelehnt (XXE-Schutz
@@ -86,7 +100,7 @@ Canon TR8550 ──eSCL (HTTP :80/eSCL)──▶ Container "scanner" ──Bind-
 
 ```bash
 python3 -m unittest discover -s tests -v                     # alle Tests
-bash -n proxmox/lxc-erstellen.sh installation/installieren.sh  # Shell-Syntax
+bash -n einrichten.sh proxmox/lxc-erstellen.sh installation/installieren.sh  # Shell-Syntax
 node --check konfiguration/scanservjs-config.local.js         # JS-Syntax (falls node da ist)
 ```
 
