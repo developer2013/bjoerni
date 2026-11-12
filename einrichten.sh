@@ -434,7 +434,9 @@ zusammenfassung() {
  Netzwerk:     $netz
  Konsole:      $konsole
 
-Jetzt einrichten? Das dauert beim ersten Mal ca. 5–10 Minuten." || abbruch
+Jetzt einrichten? Das dauert beim ersten Mal ca. 5–10 Minuten.
+
+WICHTIG: Lass dieses Fenster offen und klick in Proxmox NICHT woanders hin, bis „Alles eingerichtet!“ erscheint – sonst bricht die Installation ab. (Nebenbei schauen: zweiten Browser-Tab öffnen.)" || abbruch
 }
 
 dialoge() {
@@ -530,7 +532,8 @@ installieren() {
     "  ┌──────────────────────────────────────────────┐" \
     "  │  scan2nas · Canon TR8550 → Proxmox → NAS     │" \
     "  └──────────────────────────────────────────────┘"
-  echo
+  printf '\033[1;33m%s\033[0m\n\n' \
+    "  ⚠  Fenster offen lassen und in Proxmox nicht wegklicken, bis „Alles eingerichtet!“ erscheint."
   repo_holen
   if bash "$ARBEIT/proxmox/lxc-erstellen.sh" "$konfig"; then
     echo
