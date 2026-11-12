@@ -53,7 +53,7 @@ apt-get update -qq
 apt-get install -y -qq --no-install-recommends \
   sane-utils sane-airscan avahi-daemon libnss-mdns \
   img2pdf ocrmypdf tesseract-ocr tesseract-ocr-deu tesseract-ocr-osd \
-  python3 curl ca-certificates
+  python3 curl ca-certificates openssh-server
 ok "Pakete installiert"
 
 # avahi (mDNS) läuft in LXC-Containern nur ohne das Prozesslimit
@@ -122,6 +122,9 @@ info "Installiere scan2nas …"
 install -d -m 755 /opt/scan2nas /etc/scan2nas
 install -m 755 "$QUELLE/programm/scan2nas.py" /opt/scan2nas/scan2nas.py
 ln -sf /opt/scan2nas/scan2nas.py /usr/local/bin/scan2nas
+# Zugang für den iPhone-Kurzbefehl (docs/05-iphone-kurzbefehl.md)
+install -m 755 "$QUELLE/programm/kurzbefehl.sh" /usr/local/bin/scan2nas-kurzbefehl
+systemctl enable --now --quiet ssh 2>/dev/null || warn "SSH-Dienst ließ sich nicht starten (nur für den iPhone-Kurzbefehl nötig)."
 
 if [[ -f /etc/scan2nas/scan2nas.conf ]]; then
   ok "Vorhandene /etc/scan2nas/scan2nas.conf bleibt unverändert"

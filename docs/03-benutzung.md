@@ -1,6 +1,7 @@
 # 3. Benutzung
 
 - [Weboberfläche](#weboberfläche)
+- [iPhone-Kurzbefehl und Siri](05-iphone-kurzbefehl.md) (eigene Anleitung)
 - [Scannen per Befehl](#scannen-per-befehl)
 - [Einzug-Automatik](#einzug-automatik)
 - [Einstellungen](#einstellungen)

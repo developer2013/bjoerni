@@ -21,6 +21,7 @@ flowchart LR
 | Weg | So geht's | Gut für |
 |---|---|---|
 | **Weboberfläche** | Im Browser `http://<container-ip>:8080` öffnen und auf **Scannen** tippen | Alltag, auch vom Handy aus |
+| **iPhone-Kurzbefehl / Siri** | „Hey Siri, Scannen“, Home-Bildschirm-Knopf oder NFC-Aufkleber am Drucker ([Anleitung](docs/05-iphone-kurzbefehl.md)) | Der bequemste Weg |
 | **Befehl** | `scan2nas scannen` oder `scan2nas scannen -q einzug` | Skripte, Automatisierung |
 | **Einzug-Automatik** *(optional)* | Papier oben in den Einzug legen, nach 15 Sekunden wird gescannt | Viel Papier archivieren |
 
@@ -107,6 +108,7 @@ journalctl -u scan2nas -f          # Meldungen live mitlesen
 | [docs/02-installation.md](docs/02-installation.md) | Einzeiler, Konfigurationsdatei, manuelle Installation, Updates, Deinstallation |
 | [docs/03-benutzung.md](docs/03-benutzung.md) | Weboberfläche, Befehle, Einzug-Automatik, alle Einstellungen |
 | [docs/04-fehlerbehebung.md](docs/04-fehlerbehebung.md) | Wenn etwas nicht klappt |
+| [docs/05-iphone-kurzbefehl.md](docs/05-iphone-kurzbefehl.md) | Scannen per iPhone-Kurzbefehl, Siri und NFC |
 
 ## Weitere Anleitungen
 
@@ -127,7 +129,8 @@ bjoerni/
 ├── installation/
 │   └── installieren.sh                läuft im Container: Pakete, Scanner, Dienste
 ├── programm/
-│   └── scan2nas.py                    das eigentliche Programm (Python, ohne Zusatzpakete)
+│   ├── scan2nas.py                    das eigentliche Programm (Python, ohne Zusatzpakete)
+│   └── kurzbefehl.sh                  sicherer SSH-Zugang für den iPhone-Kurzbefehl (nur Scan-Befehle)
 ├── konfiguration/
 │   ├── scan2nas.conf.beispiel         alle Einstellungen mit Erklärung
 │   └── scanservjs-config.local.js     verbindet die Weboberfläche mit dem NAS
@@ -135,7 +138,8 @@ bjoerni/
 │   └── scan2nas.service               Hintergrunddienst im Container
 ├── tests/
 │   ├── test_scan2nas.py               automatische Tests (ohne Scanner/NAS lauffähig)
-│   └── test_einrichten.py             Tests für den Assistenten (simulierte Dialoge)
+│   ├── test_einrichten.py             Tests für den Assistenten (simulierte Dialoge)
+│   └── test_kurzbefehl.py             Tests für den Kurzbefehl-Zugang (lässt nur Scan-Befehle durch)
 ├── docs/                              ausführliche Anleitungen zu scan2nas
 └── adguard-home/                      eigenständige Anleitung: AdGuard Home auf Proxmox
 ```

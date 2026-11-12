@@ -37,6 +37,7 @@ Canon TR8550 ──eSCL (HTTP :80/eSCL)──▶ Container "scanner" ──Bind-
 |---|---|---|
 | `einrichten.sh` | Einzeiler-Assistent (whiptail): Scanner-Suche, NAS-Test, speichert `/root/.scan2nas/proxmox.conf`, lädt das Repo und ruft `lxc-erstellen.sh` auf | Proxmox-Host, per `bash -c "$(curl …)"` |
 | `programm/scan2nas.py` | Hauptprogramm (CLI + Dienst), eine Datei | Container → `/opt/scan2nas/`, Link `/usr/local/bin/scan2nas` |
+| `programm/kurzbefehl.sh` | SSH-„forced command“ für den iPhone-Kurzbefehl: übersetzt `SSH_ORIGINAL_COMMAND` (z. B. `einzug`) per Whitelist in `scan2nas scannen …`, trägt iPhone-Schlüssel mit `restrict,command=` ein | Container → `/usr/local/bin/scan2nas-kurzbefehl` |
 | `proxmox/lxc-erstellen.sh` | Einrichtung auf dem Host: NAS, Container, Bind-Mount, Wächter, Installation | Proxmox-Host |
 | `proxmox/proxmox.conf.beispiel` | Vorlage für Host-Einstellungen (echte `proxmox.conf` ist gitignored) | Host |
 | `installation/installieren.sh` | Pakete, scanservjs, SANE-Konfiguration, Dienste | Container |
@@ -96,12 +97,21 @@ Canon TR8550 ──eSCL (HTTP :80/eSCL)──▶ Container "scanner" ──Bind-
    mit setgid (2775), damit root (CLI) und `scanservjs` (Dienst/Web) beide schreiben können.
 8. **XML vom Scanner:** DOCTYPE/ENTITY werden vor dem Parsen abgelehnt (XXE-Schutz
    ohne `defusedxml`).
+9. **Kurzbefehl-Zugang:** `SSH_ORIGINAL_COMMAND` wird **nie** an eine Shell, an `eval`
+   oder als Argument weitergereicht, sondern nur per `case` gegen eine feste Liste
+   geprüft. Neue Befehle kommen in die Liste **und** in `tests/test_kurzbefehl.py`.
+   Schlüssel werden immer mit `restrict,command="/usr/local/bin/scan2nas-kurzbefehl"`
+   eingetragen.
+10. **Bash und Umlaute:** Steht direkt hinter einer Variablen ein Nicht-ASCII-Zeichen
+    (z. B. `„$x“`), immer `${x}` schreiben. Manche Bash-Versionen und Spracheinstellungen
+    lesen das Zeichen sonst als Teil des Variablennamens. Prüfen mit:
+    `LC_ALL=C grep -nE '\$[A-Za-z_][A-Za-z0-9_]*[^ -~]' *.sh */*.sh`
 
 ## Prüfen und Testen
 
 ```bash
 python3 -m unittest discover -s tests -v                     # alle Tests
-bash -n einrichten.sh proxmox/lxc-erstellen.sh installation/installieren.sh  # Shell-Syntax
+bash -n einrichten.sh proxmox/lxc-erstellen.sh installation/installieren.sh programm/kurzbefehl.sh
 node --check konfiguration/scanservjs-config.local.js         # JS-Syntax (falls node da ist)
 ```
 
