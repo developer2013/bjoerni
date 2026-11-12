@@ -142,7 +142,7 @@ Groß-/Kleinschreibung ist egal. Alles andere wird abgelehnt.
 
 | Meldung | Lösung |
 |---|---|
-| Verbindung abgelehnt / Zeitüberschreitung | Stimmt die IP? Läuft SSH im Container? `pct exec 107 -- systemctl status ssh` |
+| „konnte keine Verbindung zum SSH-Server herstellen“ | Meist die **falsche IP** bei *Host*, z. B. die des **Druckers** statt die des Scanner-**Containers**. Richtige IP: `pct exec 107 -- hostname -I`. Sonst prüfen, ob SSH im Container läuft: `pct exec 107 -- systemctl status ssh` |
 | Permission denied (publickey) | Schlüssel nicht (richtig) eingetragen → Schritt 2 wiederholen, die **ganze** Zeile in einfachen Anführungszeichen |
 | `❌ Unbekannter Befehl` | Tippfehler im Feld *Skript*, erlaubt sind nur die Befehle aus der Tabelle |
 | `❌ Scan fehlgeschlagen` + Grund | Grund lesen (z. B. „Liegt Papier im Einzug?“), sonst [Fehlerbehebung](04-fehlerbehebung.md) |

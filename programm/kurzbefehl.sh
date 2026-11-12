@@ -96,7 +96,10 @@ read -r -a woerter <<<"$(printf '%s' "$roh" | tr '[:upper:]' '[:lower:]')"
 befehl="${woerter[*]-}"
 
 case $befehl in
-  glas|"")       scannen -q glas -m farbe ;;
+  "")            # leeres Skript-Feld: lieber nur den Status zeigen, nicht ungefragt scannen
+                 "$SCAN2NAS" status 2>&1
+                 echo "Tipp: Ins Feld „Skript“ einen Befehl schreiben, z. B. einzug" ;;
+  glas)          scannen -q glas -m farbe ;;
   "glas grau")   scannen -q glas -m grau ;;
   einzug)        scannen -q einzug -m grau ;;
   "einzug farbe") scannen -q einzug -m farbe ;;

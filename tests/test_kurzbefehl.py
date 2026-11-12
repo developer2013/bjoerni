@@ -82,6 +82,12 @@ class KurzbefehlTest(unittest.TestCase):
         self.assertIn("❌ Scan fehlgeschlagen", erg.stdout)
         self.assertIn("Liegt Papier im Einzug?", erg.stdout)
 
+    def test_leeres_skriptfeld_scannt_nicht(self):
+        erg = self.starte(ssh_befehl="")
+        self.assertEqual(erg.returncode, 0, erg.stderr)
+        self.assertEqual(self.aufrufe(), ["status"], "leer = nur Status, kein Scan")
+        self.assertIn("Tipp", erg.stdout)
+
     def test_aufruf_ohne_ssh_zum_ausprobieren(self):
         erg = self.starte("einzug", "farbe")
         self.assertEqual(erg.returncode, 0, erg.stderr)
